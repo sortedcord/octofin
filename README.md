@@ -18,6 +18,21 @@ COOKIES_PATH=PATH_TO_COOKIES
 OCTO_OUTPUT_DIR=OUTPUT_DIRECTORY
 ```
 
+The `docker-compose.yml`:
+
+```yml
+services:
+  web:
+    image: sortedcord/octofin
+    ports:
+      - "8193:8193"
+    env_file:
+      - .env
+    volumes:
+      - ./path_to_music_library:/data
+    restart: unless-stopped
+```
+
 After creating the file with all the environment variables, you can build the docker container and run it:
 
 ```sh
