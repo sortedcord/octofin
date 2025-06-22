@@ -1,0 +1,6 @@
+.git
+.venv
+*.pyc
+**/__pycache__
+temp/
+octofin/db.sqlite3

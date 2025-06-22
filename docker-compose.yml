@@ -1,0 +1,10 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8193:8193"
+    volumes:
+      - /server/srv/dev-disk-by-uuid-d84656bd-bf2f-4806-994b-53c66bedcc7f/Music/Music:/data
+    restart: unless-stopped
+    env_file:
+      - .env

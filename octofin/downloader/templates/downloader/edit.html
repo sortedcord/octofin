@@ -1,0 +1,206 @@
+{% extends "downloader/base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Edit Song Metadata</h1>
+
+  {% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+  <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+  {% else %}
+  <div class="row">
+    <!-- Thumbnail Column -->
+    <div class="col-md-4">
+      <div class="card">
+        {% if cover %}
+        <img src="{{ cover }}" class="card-img-top" alt="Album cover" />
+        {% else %}
+        <div class="text-center py-5 bg-light">
+          <i class="bi bi-image text-muted" style="font-size: 5rem"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <p class="text-muted mb-1">Source URL:</p>
+          <a href="{{ url }}" target="_blank" class="small"
+            >{{ url|truncatechars:30 }}</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata Form Column -->
+    <div class="col-md-8">
+      <form
+        method="post"
+        enctype="multipart/form-data"
+        action="{% url 'edit' task_id %}"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="task_id" value="{{ task_id }}" />
+
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input
+            type="text"
+            class="form-control"
+            name="title"
+            value="{{ title }}"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Artists</label>
+          <input
+            type="text"
+            class="form-control"
+            name="artists"
+            value="{{ artists|join:', ' }}"
+            placeholder="e.g. Artist1, Artist2"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Album</label>
+          <input
+            type="text"
+            class="form-control"
+            name="album"
+            value="{{ album }}"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Album Artist</label>
+          <input
+            type="text"
+            class="form-control"
+            name="album_artists"
+            value="{{ album_artists|join:', ' }}"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Genres</label>
+          <input
+            type="text"
+            class="form-control"
+            name="genres"
+            value="{{ genres|join:', ' }}"
+            placeholder="e.g. J-pop, Rock, Seiyu, Jazz"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Track Number</label>
+          <input
+            type="text"
+            class="form-control"
+            name="tracknumber"
+            value="{{ track_number }}"
+            placeholder="1"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">URL</label>
+          <input
+            type="text"
+            class="form-control"
+            name="url"
+            value="{{ url }}"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Release Date</label>
+          <input
+            type="date"
+            class="form-control"
+            name="release_date"
+            value="{{ release_date }}"
+            placeholder="YYYY-MM-DD"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Custom Thumbnail</label>
+          <input
+            type="file"
+            class="form-control"
+            name="cover_art"
+            accept="image/*"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Cover URL</label>
+          <input
+            type="url"
+            class="form-control"
+            name="cover"
+            value="{{cover}}"
+          />
+        </div>
+
+        <div class="mt-4">
+          <h4>Available Formats</h4>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Format ID</th>
+                  <th>Format Note</th>
+                  <th>Extension</th>
+                  <th>Audio Codec</th>
+                  <th>Audio Extension</th>
+                  <th>Total Bitrate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for fmt in a_info.formats %} {% if fmt.acodec == "none"%} 
+                {% else %}
+                <tr>
+                  <td>{{ fmt.format_id }}</td>
+                  <td>{{ fmt.format_note }}</td>
+                  <td>{{ fmt.ext }}</td>
+                  <td>{{ fmt.acodec }}</td>
+                  <td>{{ fmt.audio_ext }}</td>
+                  <td>
+                    {% if fmt.tbr %} {{ fmt.tbr }} kbps {% else %} N/A {% endif %}
+                  </td>
+                </tr>
+                {% endif %} 
+                
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-muted">
+                    No formats available
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
+  
+  <button type="submit" name="delete_task" value="1" class="btn btn-danger"
+          onclick="return confirm('Are you sure you want to delete this task?');">
+    Delete Task
+  </button>
+
+  <button type="submit" name="save_download" value="1" class="btn btn-primary">
+    Save & Download
+  </button>
+</div>
+
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %} {% block extra_js %}
+<script></script>
+{% endblock %}
