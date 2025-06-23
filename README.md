@@ -2,6 +2,11 @@
 
 Octofin is a set of tools and scripts that adds QoL functionality to your jellyfin music library.
 
+## Contents
+
+- [1. YTM Importer](#1-ytm-importer)
+- [2. Liked Songs Playlist](#2-liked-songs-playlist)
+
 ## 1. YTM Importer
 
 Octofin has a youtube music downloader that will download tracks from youtube music and add to your music library.
@@ -40,3 +45,7 @@ $ docker-compose up --build
 ```
 
 The downloader should now be accessible at `http://localhost:8193`
+
+## 2. Liked Songs Playlist
+
+Allows you to enable a virtual playlist that automatically syncs up all your favorite songs and updates dynamically. It is an extended version of [Jellyfin Liked Playlist](https://github.com/Groovbox/jellyfin-liked-playlist) with better management and a configuration page.

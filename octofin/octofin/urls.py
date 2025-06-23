@@ -3,5 +3,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('downloader.urls')),  # This makes 'home' the site root
+    path('ytm/', include('downloader.urls')),
+    path('likedplaylist/', include('likedplaylist.urls'))
 ]
