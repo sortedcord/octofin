@@ -36,9 +36,36 @@ def get_playlists(account):
 
 def create_playlist(account, name):
     url = f"{account.server}/Playlists"
-    payload = {"Name": name, "UserId": account.user_id}
+    payload = {"Name": name, "UserId": account.user_id, "isPublic":False}
     response = requests.post(url, json=payload, headers=get_headers(account.token))
-    return response.json()['Id']
+    playlist_id = response.json()['Id']
+    
+    
+    # Update description
+    
+    payload = {"Id":playlist_id,
+               "Name":"Liked Songs",
+               "OriginalTitle":"Liked Songs",
+               "ForcedSortName":"",
+               "CommunityRating":"",
+               "CriticRating":"",
+               "IndexNumber":None,
+               "AirsBeforeSeasonNumber":"",
+               "AirsAfterSeasonNumber":"",
+               "AirsBeforeEpisodeNumber":"",
+               "ParentIndexNumber":None,
+               "DisplayOrder":"",
+               "Album":"","AlbumArtists":[],"ArtistItems":[],
+               "Overview":f"{account.username}'s Liked Songs Playlist",
+               "Status":"","AirDays":[],"AirTime":"","Genres":[],"Tags":[],"Studios":[],
+               "PremiereDate":None,"DateCreated":"1970-01-01T00:01:00.000Z","EndDate":None,
+               "ProductionYear":"","Height":"","AspectRatio":"","Video3DFormat":"","OfficialRating":"",
+               "CustomRating":"","People":[],"LockData":False,"LockedFields":[],"ProviderIds":{},
+               "PreferredMetadataLanguage":"","PreferredMetadataCountryCode":"","Taglines":[]}
+    url = f"{account.server}/Items/{playlist_id}"
+    response = requests.post(url, json=payload, headers=get_headers(account.token))
+    
+    return playlist_id
 
 def get_fav_tracks(account):
     url = f"{account.server}/Items?includeItemTypes=Audio&filters=IsFavorite&Recursive=true"
@@ -77,6 +104,8 @@ def update_playlist_icon(account, playlist_id, image_path):
     )
 
 def sync_playlist_for_account(account, config):
+    if not account.is_active:
+        return
     # Authentication
     if not account.token:
         authenticate_account(account)

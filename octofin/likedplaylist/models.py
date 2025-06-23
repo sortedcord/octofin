@@ -8,6 +8,8 @@ class JellyfinAccount(models.Model):
     token = models.CharField(max_length=255, blank=True, null=True)
     user_id = models.CharField(max_length=255, blank=True, null=True)
     liked_playlist_id = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    last_synced = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.username
