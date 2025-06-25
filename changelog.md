@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use context processing for footer version
 - Changelog formatting on homescreen
 - [ ] Refactor app config
+- Separated static js from html templates
 
 ### Fixed
 - [ ] DB error for likedplaylist app
