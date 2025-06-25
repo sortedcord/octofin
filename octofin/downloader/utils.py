@@ -2,6 +2,7 @@ import os.path
 from io import BytesIO
 from PIL import Image
 import pykakasi
+import requests
 
 def japanese_to_romaji(text: str) -> str:
     kakasi = pykakasi.kakasi()
@@ -34,11 +35,17 @@ def crop_to_square_bytes(image_bytes: bytes) -> bytes:
     image.save(buffer, format=image_format)
     return buffer.getvalue()
 
-def read_changelog() -> list[dict]:
-    if not os.path.exists('changelog.md'):
-        return [{}]
+def read_changelog(changelog_location = 'changelog.md') -> list[dict]:
+    if os.path.exists('/app/changelog.md'):
+        changelog_location = '/app/changelog.md'
 
-    with open('changelog.md') as f:
+    if not os.path.exists(changelog_location):
+        data = requests.get("https://raw.githubusercontent.com/sortedcord/octofin/refs/heads/master/changelog.md")
+        print("Fetching changelog")
+        with open(changelog_location, 'w') as f:
+            f.write(data.text)
+
+    with open(changelog_location) as f:
         raw_markdown = f.read()
 
     version_data = raw_markdown.split("## [")[1:]

@@ -4,3 +4,7 @@
 **/__pycache__
 temp/
 octofin/db.sqlite3
+cookies.txt
+.txt
+.env
+docker-compose.yml
