@@ -36,18 +36,31 @@
         {% csrf_token %}
         <input type="hidden" name="task_id" value="{{ task_id }}" />
 
-        <div class="mb-3">
-          <label class="form-label">Title</label>
-          <input
-            type="text"
-            class="form-control"
-            name="title"
-            value="{{ title }}"
-            required
-          />
-        </div>
+          <div class="mb-3">
+              <label class="form-label" for="title">Title</label>
+              <div class="input-group">
+                  <input
+                          type="text"
+                          class="form-control"
+                          name="title"
+                          id="title"
+                          value="{{ title }}"
+                          required
+                  />
+                  <button
+                          type="button"
+                          class="btn btn-success"
+                          data-romanize="title"
+                          onclick="append_romanization('title', this)"
+                          title="Romanize"
+                  >
+                      <i class="bi bi-translate"></i>
+                  </button>
+              </div>
+          </div>
 
-        <div class="mb-3">
+
+          <div class="mb-3">
           <label class="form-label">Artists</label>
           <input
             type="text"
@@ -61,12 +74,33 @@
 
         <div class="mb-3">
           <label class="form-label">Album</label>
-          <input
-            type="text"
-            class="form-control"
-            name="album"
-            value="{{ album }}"
-          />
+            <div class="input-group">
+                <input
+                        type="text"
+                        class="form-control"
+                        name="album"
+                        value="{{ album }}"
+                        id="album"
+                />
+                <button
+                        type="button"
+                        class="btn btn-success"
+                        data-romanize="album"
+                        onclick="append_romanization('album', this)"
+                        title="Romanize"
+                >
+                    <i class="bi bi-translate"></i>
+                </button>
+                <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="copy_title('album')"
+                        title="Copy Title"
+                >
+                    <i class="bi bi-clipboard"></i>
+                </button>
+
+            </div>
         </div>
 
         <div class="mb-3">
@@ -142,50 +176,30 @@
           />
         </div>
 
-        <div class="mt-4">
-          <h4>Available Formats</h4>
-          <div class="table-responsive">
-            <table class="table table-striped align-middle">
-              <thead>
-                <tr>
-                  <th>Format ID</th>
-                  <th>Format Note</th>
-                  <th>Extension</th>
-                  <th>Audio Codec</th>
-                  <th>Audio Extension</th>
-                  <th>Total Bitrate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for fmt in a_info.formats %} {% if fmt.acodec == "none"%} 
-                {% else %}
-                <tr>
-                  <td>{{ fmt.format_id }}</td>
-                  <td>{{ fmt.format_note }}</td>
-                  <td>{{ fmt.ext }}</td>
-                  <td>{{ fmt.acodec }}</td>
-                  <td>{{ fmt.audio_ext }}</td>
-                  <td>
-                    {% if fmt.tbr %} {{ fmt.tbr }} kbps {% else %} N/A {% endif %}
-                  </td>
-                </tr>
-                {% endif %} 
-                
-                {% empty %}
-                <tr>
-                  <td colspan="6" class="text-center text-muted">
-                    No formats available
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          <div class="mb-3">
+              <label class="form-label" for="lyrics">Lyrics</label>
+              <textarea class="form-control mb-1" name="lyrics" id="lyrics" rows="10">{{ lyrics|default:'' }}</textarea>
+              <button type="button"
+                      class="btn btn-success"
+                      data-romanize="lyrics"
+                      onclick="romanize('lyrics', true)">
+                  Romanize Lyrics
+              </button>
+              <a href="https://www.google.com/search?q={{ title }} {{ artists.0 }} lyrics" target="_blank">
+                  <button type="button"
+                          class="btn btn-primary">
+                      Search Lyrics
+                  </button>
+              </a>
+
           </div>
-        </div>
+
+
+
 
         <div class="d-flex justify-content-between mt-4">
   <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
-  
+
   <button type="submit" name="delete_task" value="1" class="btn btn-danger"
           onclick="return confirm('Are you sure you want to delete this task?');">
     Delete Task
@@ -196,11 +210,119 @@
   </button>
 </div>
 
+          <div class="mt-4">
+              <h4>Available Formats</h4>
+              <div class="table-responsive">
+                  <table class="table table-striped align-middle">
+                      <thead>
+                      <tr>
+                          <th>Format ID</th>
+                          <th>Format Note</th>
+                          <th>Extension</th>
+                          <th>Audio Codec</th>
+                          <th>Audio Extension</th>
+                          <th>Total Bitrate</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for fmt in a_info.formats %} {% if fmt.acodec == "none"%}
+                      {% else %}
+                          <tr>
+                              <td>{{ fmt.format_id }}</td>
+                              <td>{{ fmt.format_note }}</td>
+                              <td>{{ fmt.ext }}</td>
+                              <td>{{ fmt.acodec }}</td>
+                              <td>{{ fmt.audio_ext }}</td>
+                              <td>
+                                  {% if fmt.tbr %} {{ fmt.tbr }} kbps {% else %} N/A {% endif %}
+                              </td>
+                          </tr>
+                      {% endif %}
+
+                      {% empty %}
+                          <tr>
+                              <td colspan="6" class="text-center text-muted">
+                                  No formats available
+                              </td>
+                          </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+
       </form>
     </div>
   </div>
   {% endif %}
 </div>
-{% endblock %} {% block extra_js %}
-<script></script>
 {% endblock %}
+
+{% block extra_js %}
+    <script>
+
+        // Generalized romanize function
+        function romanize(elementId, replace=false) {
+            const element = document.getElementById(elementId);
+            return fetch('/ytm/romanize/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `lyrics=${encodeURIComponent(element.value)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.romanized) {
+                        if (replace) {
+                            element.value = data.romanized;
+                        }
+                        return data.romanized;
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                });
+        }
+
+        function append_romanization(elementId, button) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            // Optional: handle button loading state
+            let originalText;
+            if (button) {
+                originalText = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                button.disabled = true;
+            }
+
+            romanize(elementId)
+                .then(romanized => {
+                    const currentValue = element.value.trim();
+                    const separator = currentValue ? ' / ' : '';
+                    element.value = currentValue + separator + romanized;
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                })
+                .finally(() => {
+                    if (button) {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                });
+        }
+
+        function copy_title(targetId) {
+            const source = document.getElementById('title');
+            const target = document.getElementById(targetId);
+            if (source && target) {
+                target.value = source.value;
+            }
+        }
+
+    </script>
+{% endblock %}
+

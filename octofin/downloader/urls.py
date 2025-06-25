@@ -11,5 +11,5 @@ urlpatterns = [
     path('queue-status/', views.queue_status, name='queue_status'),
     path('task/delete/<int:task_id>/', views.delete_task, name='delete_task'),
     path('tasks/clear/', views.clear_tasks, name='clear_tasks'),
-
+    path('romanize/', views.romanize, name='romanize'),
 ]

@@ -7,12 +7,20 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-
+from .utils import japanese_to_romaji, read_changelog
 
 
 def home(request):
     tasks = DownloadTask.objects.all().order_by('-created_at')
-    return render(request, "downloader/index.html", {'tasks': tasks})
+    changelog_data = read_changelog()
+    current_version = changelog_data[0]['version']
+    return render(request, "downloader/index.html",
+                  {
+                      'tasks': tasks,
+                      'current_version':current_version,
+                      'changelog': changelog_data
+                  })
+
 
 def create_task(request):
     if request.method == "POST":
@@ -38,10 +46,11 @@ def fetch_metadata(task_id):
         task.status = 'ready'
         task.save()
     except Exception as e:
-        raise e
+        print(e)
         task.status = 'failed'
         task.error = str(e) # type: ignore
         task.save()
+        raise e
 
 
 def edit(request, task_id):
@@ -62,7 +71,8 @@ def edit(request, task_id):
                 'track_number': request.POST.get('tracknumber'),
                 'cover': request.POST.get('cover'),
                 'url': request.POST.get('url'),
-                'release_date': request.POST.get('release_date')
+                'release_date': request.POST.get('release_date'),
+                'lyrics': request.POST.get('lyrics')
             }
             
             for key, value in edited_data.items():
@@ -70,12 +80,12 @@ def edit(request, task_id):
             
             # Start download in background
             task.status = 'downloading'
+            task.title = task.metadata['title']
             task.save()
             threading.Thread(target=process_download, args=(task.id,)).start() # type: ignore
             
             return redirect('home')
     
-    # Use edited metadata if available, else use fetched metadata
     context = task.metadata
     context['task_id'] = task_id
     return render(request, 'downloader/edit.html', context)
@@ -88,14 +98,16 @@ def process_download(task_id):
         info = task.metadata
                 
         # Download and process
-        file_path = download_song(info) + ".opus" # type: ignore
+        file_path = download_song(info)
+        task.status = 'importing'
+        task.save()
         apply_metadata(file_path, info)
         import_song(file_path, info)
         
         task.status = 'completed'
         task.save()
     except Exception as e:
-        raise e
+        print(e)
         task.status = 'failed'
         task.save()
 
@@ -126,13 +138,22 @@ def clear_tasks(request):
     return redirect('home')
 
 def settings(request):
-    COOKIES_PATH:str = os.getenv('COOKIES_PATH')
-    
-    cookies_data = open(COOKIES_PATH).read()
-    
+    cookies_path:str = os.getenv('COOKIES_PATH')
+    if cookies_path is not None and os.path.exists(cookies_path):
+        cookies_data = open(cookies_path).read()
+    else:
+        cookies_data= ""
+
     return render(request, "downloader/settings.html", context={
-        'COOKIES_PATH': COOKIES_PATH, 
+        'COOKIES_PATH': cookies_path,
         'PO_TOKEN' : os.getenv('PO_TOKEN'),
         'OUTPUT_DIR': os.getenv('OCTO_OUTPUT_DIR'),
         'cookies_data':cookies_data
     })
+
+def romanize(request):
+    if request.method == 'POST':
+        lyrics = request.POST.get('lyrics', '')
+        romanized = japanese_to_romaji(lyrics)
+        return JsonResponse({'romanized': romanized})
+    return JsonResponse({'error': 'Invalid request'}, status=400)

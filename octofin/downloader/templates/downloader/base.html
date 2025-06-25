@@ -41,7 +41,7 @@
 
     <footer class="footer mt-auto py-3 bg-light border-top">
         <div class="container text-center">
-            <span class="text-muted">&copy; {{ year|default:2025 }} YouTube Music Importer</span>
+            <span class="text-muted">&copy; {{ year|default:2025 }} YouTube Music Importer {% block version %}{% endblock %}</span>
         </div>
     </footer>
 

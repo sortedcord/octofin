@@ -6,6 +6,8 @@ import base64
 import struct
 import requests
 import shutil
+from .utils import crop_to_square_bytes
+from .models import DictionaryKey
 
 
 COOKIES_PATH = os.getenv('COOKIES_PATH')
@@ -18,9 +20,56 @@ def download_image_bytes(url):
     response.raise_for_status()
     return response.content
 
+def extract_data(raw_data:dict) -> dict:
+    info = {
+        'a_info': raw_data,
+        'url': f"https://music.youtube.com/watch?v={raw_data['id']}",
+        'title': raw_data['title'],
+        'album': raw_data['album'] if 'album' in raw_data else raw_data['title'],
+        'track_number': 1,
+        'genres': []
+    }
+
+    try:
+        thumbnail = raw_data['thumbnails'][0]['url']
+    except KeyError or IndexError:
+        thumbnail = raw_data['thumbnail']
+
+    if thumbnail.endswith('-rj'):
+        thumbnail = thumbnail.split("=w")[0] +'=w1400-h1400-l100'
+    else:
+        thumbnail = raw_data['thumbnail']
+    info['cover'] = thumbnail
+
+    if 'release_date' not in raw_data:
+        info['release_date'] = f"{raw_data['upload_date'][:4]}-{raw_data['upload_date'][4:6]}-{raw_data['upload_date'][6:]}"
+    else:
+        info['release_date'] = f"{raw_data['release_date'][:4]}-{raw_data['release_date'][4:6]}-{raw_data['release_date'][6:]}"
+
+    if 'artists' in raw_data:
+        info['artists'] = raw_data['artists']
+    else:
+        info['artists'] = [raw_data['channel']]
+
+    info['album_artists'] = [info['artists'][0]]
+
+    dictionary = DictionaryKey.objects.all()
+    for key, value in info.items():
+        for dictionary_key in dictionary:
+            if dictionary_key.to_replace in value:
+                info[key] = value.replace(dictionary_key.to_replace, dictionary_key.replacement)
+
+    return info
 
 def getytdata(url:str) -> dict:
     os.makedirs('temp/', exist_ok=True)
+
+    v_id = url.split("?v=")[-1].split("&")[0]
+    file = f'temp/{v_id}.json'
+    if os.path.exists(file):
+        raw_data = json.loads(open(file).read())
+        return extract_data(raw_data)
+
     ydl_opts = {
         'cookiefile': f'{COOKIES_PATH}',
         'extract_flat': 'discard_in_playlist',
@@ -30,37 +79,15 @@ def getytdata(url:str) -> dict:
                 }
             },
         }
-    
-    v_id = url.split("?v=")[-1].split("&")[0]
-    file = f'temp/{v_id}.json'
-    
-    if os.path.exists(file):
-        return json.loads(open(file).read())
 
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         _info:dict = ydl.extract_info(url, download=False) # type: ignore
-    
-    # open('raw_data.json', 'w').write(json.dumps(_info, indent=2))
-    
-    
-    info = {
-        'a_info': _info,
-        'url': url,
-        'title': _info['title'],
-        'artists': _info['artists'],
-        'release_date': f"{_info['release_date'][:4]}-{_info['release_date'][4:6]}-{_info['release_date'][6:]}",
-        'cover': _info['thumbnails'][0]['url'].split("=w")[0] +'=w1400-h1400-l100',
-        'album': _info['album'] if 'album' in _info else _info['title'],
-        'album_artists': [_info['artists'][0]],
-        'track_number': 1,
-        'genres': []
-    }
-    print("Writing to file")
-    with open(file, 'w') as f:
-        f.write(json.dumps(info, indent=2))
 
-    return info
+    with open(file, 'w') as f:
+        f.write(json.dumps(_info, indent=2))
+
+    return extract_data(_info)
 
 def download_song(info:dict) -> str:
     ydl_opts = {
@@ -81,11 +108,11 @@ def download_song(info:dict) -> str:
             }
             
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        temp_file = ydl.prepare_filename(info['a_info'])
-        error_code = ydl.download(info['url'])
-        print(error_code)
-        print(temp_file)
-    
+        temp_file = ydl.prepare_filename(info['a_info']) + '.opus'
+        if not os.path.exists(temp_file):
+            error_code = ydl.download(info['url'])
+            print(error_code)
+
     return temp_file
         
 def apply_metadata(file, info):
@@ -109,11 +136,16 @@ def apply_metadata(file, info):
         tags['genre'] = info['genres']
     if info.get('track_number'):
         tags['tracknumber'] = [str(info['track_number'])]
+    if info.get('lyrics'):
+        tags['lyrics'] = [info['lyrics']]
 
     # Handle cover art from URL
     cover_url = info.get('cover')
     if cover_url:
         cover_data = download_image_bytes(cover_url)  # Download image as bytes
+
+        if not cover_url.endswith('-rj'):
+            cover_data = crop_to_square_bytes(cover_data)
 
         # Create METADATA_BLOCK_PICTURE structure (type 3 = front cover, mime type guessed as jpeg)
         mime = 'image/jpeg'
@@ -146,26 +178,17 @@ def import_song(file_path, info):
 
     album = info.get('album', 'Unknown Album').replace('/', '_')
 
-    # Try to get year from release_date or year key
     year = 'Unknown Year'
     if 'release_date' in info and info['release_date']:
         year = str(info['release_date'])[:4]
     elif 'year' in info and info['year']:
         year = str(info['year'])
 
-    # Construct destination directory
     dest_dir = os.path.join(OUTPUT_DIR, album_artist, f'[{year}] {album}') # type: ignore
 
-    # Create destination directory if it doesn't exist
     os.makedirs(dest_dir, exist_ok=True)
-
-    # Get the filename from the file_path
     filename = os.path.basename(file_path)
-
-    # Construct destination file path
     dest_path = os.path.join(dest_dir, filename)
-
-    # Move the file
     shutil.move(file_path, dest_path)
 
     return dest_path

@@ -36,6 +36,12 @@ class Song(models.Model):
     def __str__(self):
         return f"{self.artist or 'Unknown Artist'} - {self.title}"
 
+class DictionaryKey(models.Model):
+    to_replace =  models.CharField(max_length=255)
+    replacement = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.to_replace} -> {self.replacement}"
 
 class DownloadTask(models.Model):
     STATUS_CHOICES = [
