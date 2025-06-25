@@ -20,6 +20,8 @@ COPY . /app/
 EXPOSE 8193
 
 RUN python /app/octofin/manage.py makemigrations
+RUN python /app/octofin/manage.py makemigrations likedplaylist
+RUN python /app/octofin/manage.py makemigrations downloader
 RUN python /app/octofin/manage.py migrate
 
 # Use Gunicorn as the entrypoint, point to the wsgi.py inside the Django project

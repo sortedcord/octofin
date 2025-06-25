@@ -8,6 +8,7 @@ urlpatterns = [
     path('edit/<int:task_id>/', views.edit, name='edit'),
     # path('download/', views.download, name='download'),
     path('settings/', views.settings, name='settings'),
+    path('automation/', views.automation_view, name='automation'),
     path('queue-status/', views.queue_status, name='queue_status'),
     path('task/delete/<int:task_id>/', views.delete_task, name='delete_task'),
     path('tasks/clear/', views.clear_tasks, name='clear_tasks'),

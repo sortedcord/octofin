@@ -19,7 +19,7 @@
     <!-- Right Column: Processing Queue -->
     <div class="col-md-8">
       <div class="card shadow-sm">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center">
           <h2 class="mb-0">Processing Queue</h2>
           <form method="post" action="{% url 'clear_tasks' %}" style="margin: 0;">
             {% csrf_token %}
@@ -232,4 +232,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-{% block version %} | Ver {{ current_version }}{% endblock %}

@@ -35,7 +35,7 @@ def crop_to_square_bytes(image_bytes: bytes) -> bytes:
     image.save(buffer, format=image_format)
     return buffer.getvalue()
 
-def read_changelog(changelog_location = 'changelog.md') -> list[dict]:
+def read_changelog(changelog_location = 'changelog.md') -> (str,str):
     if os.path.exists('/app/changelog.md'):
         changelog_location = '/app/changelog.md'
 

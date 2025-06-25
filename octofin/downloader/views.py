@@ -157,3 +157,6 @@ def romanize(request):
         romanized = japanese_to_romaji(lyrics)
         return JsonResponse({'romanized': romanized})
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def automation_view(request):
+    return render(request, 'downloader/automation.html')
