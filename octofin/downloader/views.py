@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .worker import getytdata, download_song, apply_metadata, import_song
+from .worker import apply_metadata, import_song
+from .youtube import get_yt_data, download_song
 from .models import DownloadTask
 import threading
 import os
@@ -47,9 +48,9 @@ def create_task(request):
         if not url.startswith('https://music.youtube.com/'):
             messages.error(request, "Invalid URL. Please enter a YouTube Music URL.")
             return redirect('home')
-        if 'playlist?list=' in url:
-            messages.error(request, "Playlists are not supported yet.")
-            return redirect('home')
+        # if 'playlist?list=' in url:
+        #     messages.error(request, "Playlists are not supported yet.")
+        #     return redirect('home')
         task = DownloadTask.objects.create(url=url, status='fetching')
         threading.Thread(target=fetch_metadata, args=(task.id,)).start()
         return redirect('home')
@@ -59,7 +60,7 @@ def create_task(request):
 def fetch_metadata(task_id):
     task = DownloadTask.objects.get(id=task_id)
     try:
-        metadata = getytdata(task.url)
+        metadata = get_yt_data(task.url)
         task.metadata = metadata # type: ignore
         task.title = metadata.get('title', 'Unknown Title')
         task.status = 'ready'
@@ -142,6 +143,10 @@ def queue_status(request):
             'status_display': status_mapping.get(task['status'], task['status'])
         })
     return JsonResponse(task_list, safe=False)
+
+def restart_task(request):
+    # TODO: Allow user to restart failed task
+    return
 
 
 @require_POST

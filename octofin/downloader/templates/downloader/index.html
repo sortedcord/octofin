@@ -57,6 +57,7 @@
                     </div>
                 </div>
 
+{# TODO: Separate Page for full changelog, put only the latest version here, improve sizing #}
                 <!-- Changelog Card -->
                 <div class="card shadow-sm mt-4">
                     <div class="card-header bg-body-tertiary">
@@ -128,6 +129,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush" id="task-queue">
+{# TODO: Show thumbnails after fetching metadata #}
                             {% for task in tasks %}
                                 <a href="{% if task.status == 'ready' %}{% url 'edit' task.id %}{% else %}#{% endif %}"
                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3
@@ -253,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tasks.forEach(task => {
                         const link = (task.status === 'ready') ? `edit/${task.id}/` : '#';
                         queue.innerHTML += `
-                          <a href="${link}" 
+                          <a href="${link}"
                              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center ${task.status === 'ready' ? 'list-group-item-success' : ''}">
                               <div>
                                   <h5 class="mb-1">${task.title || 'Fetching metadata...'}</h5>
@@ -308,12 +310,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (url.includes('playlist?list=')) {
-            e.preventDefault();
-            errorAlert.textContent = 'Playlists are not supported yet.';
-            errorAlert.classList.remove('d-none');
-            return;
-        }
+        // if (url.includes('playlist?list=')) {
+         //   e.preventDefault();
+          //  errorAlert.textContent = 'Playlists are not supported yet.';
+         //   errorAlert.classList.remove('d-none');
+         //   return;
+        //}
     });
 });
 </script>

@@ -106,3 +106,14 @@ def read_changelog(changelog_location = 'changelog.md') -> (str,str):
 
 
     return versions
+
+
+def download_image_bytes(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.content
+
+
+def fetch_lyrics():
+    # TODO: Make use of a lyrics provider
+    return

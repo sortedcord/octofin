@@ -5,6 +5,9 @@ from pathlib import Path
 import base64
 import time
 from django.conf import settings
+from .models import JellyfinAccount
+from django.utils import timezone
+
 
 def get_headers(token=None, content_type=None):
     auth_str = 'MediaBrowser Client="Octo", Device="Chrome", DeviceId="TW96aWxsYS81LjAgKFgxMaHJvbWUvMTMxLjAuMCNjc4NQ11", Version="10.10.3"'
@@ -109,7 +112,7 @@ def update_playlist_icon(account, playlist_id, image_path):
         data=base64.b64encode(image_data)
     )
 
-def sync_playlist_for_account(account, config):
+def sync_playlist_for_account(account:JellyfinAccount, config):
     from config.utils import get_config
     icon_path = get_config('LIKED_SONGS_PLAYLIST_ICON')
 
@@ -146,4 +149,7 @@ def sync_playlist_for_account(account, config):
     for track, fav_status in playlist_tracks:
         if not fav_status:
             remove_item_from_playlist(account, account.liked_playlist_id, track)
+
+    account.last_synced = timezone.now()
+    account.save()
 

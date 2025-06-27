@@ -1,3 +1,0 @@
-- [Backend] Use a lyric provider
-- [Frontend] Ability to restart failed downloads
-- [Frontend] Better error reporting
