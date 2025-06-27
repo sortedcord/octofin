@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import JellyfinAccount, AppConfig
-from .jellyfin import remove_item_from_playlist, add_items_to_playlist, sync_playlist_for_account
+from .jellyfin import remove_item_from_playlist, add_items_to_playlist, sync_playlist_for_account, get_playlist_tracks
 import json
 from django.shortcuts import render, redirect
 from .forms import JellyfinAccountForm, AccountToggleForm
@@ -65,10 +65,11 @@ def jellyfin_webhook(request):
             print("Account not found")
             return JsonResponse({"error": "Account not found"}, status=404)
         
-        if save_reason == 'Unsave':
-            remove_item_from_playlist(account, account.liked_playlist_id, item_id)
-        else:  # 'Save'
-            add_items_to_playlist(account, account.liked_playlist_id, [item_id])
+        if save_reason == 'UpdateUserRating':
+            if item_id in get_playlist_tracks(account, account.liked_playlist_id):
+                remove_item_from_playlist(account, account.liked_playlist_id, item_id)
+            else:
+                add_items_to_playlist(account, account.liked_playlist_id, [item_id])
         
         return JsonResponse({"status": "success"})
     

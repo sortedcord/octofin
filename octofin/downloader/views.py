@@ -8,7 +8,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .utils import japanese_to_romaji, read_changelog, downloader_availability, DownloaderError
-from config.models import  GlobalConfig
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 
 
 def home(request):
@@ -169,6 +170,7 @@ def settings(request):
         'cookies_data':cookies_data
     })
 
+@ensure_csrf_cookie
 def romanize(request):
     if request.method == 'POST':
         lyrics = request.POST.get('lyrics', '')

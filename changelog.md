@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [ ] Playlist matching
   - [ ] Playlist creation
 - Dynamic Dark Mode Support
-- [ ] Error reporting for downloader
+- Error reporting for downloader (incomplete/invalid configurations)
 
 ### Changed
 - Use context processing for footer version
@@ -19,11 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor settings to app config
 - Separated static js from html templates
 - Design update
-- [ ] Switched from pykakasi to cutlet
+- Switched from pykakasi to cutlet, better translations fixes #4
 
 ### Fixed
-- [ ] DB error for likedplaylist app
+- DB error for likedplaylist app
 - [ ] Format error for release date causing failed download
+- Romanization not working due to invalid csrf
+- Liked playlist not syncing songs removed from favorites.
 
 ## [0.0.1a] - 2025-06-25
 ### Added

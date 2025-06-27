@@ -1,7 +1,7 @@
 import os.path
 from io import BytesIO
 from PIL import Image
-import pykakasi
+import cutlet
 import requests
 from enum import  Enum
 from config.utils import get_config
@@ -42,15 +42,10 @@ def downloader_availability() -> DownloaderError|int:
 
 
 def japanese_to_romaji(text: str) -> str:
-    kakasi = pykakasi.kakasi()
-    kakasi.setMode("H", "a")  # Hiragana to ascii
-    kakasi.setMode("K", "a")  # Katakana to ascii
-    kakasi.setMode("J", "a")  # Kanji to ascii
-    kakasi.setMode("r", "Hepburn")  # Use Hepburn Romanization
-    kakasi.setMode("s", True)  # Add space between words
-    converter = kakasi.getConverter()
-
-    return converter.do(text)
+    katsu = cutlet.Cutlet()
+    converted = (katsu.romaji(text))
+    print(converted)
+    return converted
 
 def crop_to_square_bytes(image_bytes: bytes) -> bytes:
     # Load image from bytes

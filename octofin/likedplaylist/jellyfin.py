@@ -1,3 +1,5 @@
+import json
+
 import requests
 from pathlib import Path
 import base64
@@ -72,10 +74,14 @@ def get_fav_tracks(account):
     response = requests.get(url, headers=get_headers(account.token))
     return [item['Id'] for item in response.json()["Items"]]
 
-def get_playlist_tracks(account, playlist_id):
+def get_playlist_tracks(account, playlist_id, fav_status=False):
     url = f"{account.server}/Playlists/{playlist_id}/Items"
     response = requests.get(url, headers=get_headers(account.token))
-    return [item['Id'] for item in response.json()["Items"]]
+    # print(json.dumps(response.json()["Items"], indent=2))
+    if fav_status:
+        return [(item['Id'], item['UserData']['IsFavorite']) for item in response.json()["Items"]]
+    else:
+        return [item['Id'] for item in response.json()["Items"]]
 
 def add_items_to_playlist(account, playlist_id, items):
     batch_size = 100
@@ -134,3 +140,10 @@ def sync_playlist_for_account(account, config):
     
     if missing:
         add_items_to_playlist(account, account.liked_playlist_id, missing)
+
+    playlist_tracks = get_playlist_tracks(account, account.liked_playlist_id, fav_status=True)
+
+    for track, fav_status in playlist_tracks:
+        if not fav_status:
+            remove_item_from_playlist(account, account.liked_playlist_id, track)
+
