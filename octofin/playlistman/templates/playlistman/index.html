@@ -1,0 +1,187 @@
+{% extends "downloader/base.html" %}
+{% block content %}
+
+    <div class="container mt-4">
+        <!-- Header with Add New button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-5">Playlist Manager</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlaylistModal">
+                <i class="bi bi-plus-circle me-2"></i>Add New
+            </button>
+        </div>
+
+        <!-- Regular Playlists Section -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4">Your Playlists</h2>
+                <span class="badge bg-primary rounded-pill">4 playlists</span>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                <!-- Dummy Playlist Cards -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Chill Vibes</h5>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                            <p class="card-text text-muted">12 songs • 45 minutes</p>
+                            <p class="card-text">Perfect relaxation mix</p>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button class="btn btn-sm btn-outline-success">Sync</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Workout Hits</h5>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                            <p class="card-text text-muted">25 songs • 1h 20m</p>
+                            <p class="card-text">Energy boost for gym sessions</p>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button class="btn btn-sm btn-outline-success">Sync</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Road Trip 2025</h5>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                            <p class="card-text text-muted">18 songs • 1h 05m</p>
+                            <p class="card-text">Summer adventure soundtrack</p>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button class="btn btn-sm btn-outline-secondary" disabled>Syncing...</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Focus Flow</h5>
+                                <span class="badge bg-danger">Failed</span>
+                            </div>
+                            <p class="card-text text-muted">8 songs • 30m</p>
+                            <p class="card-text">Concentration booster</p>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button class="btn btn-sm btn-outline-warning">Retry</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Playlists Section -->
+        <section class="mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4">Smart Playlists</h2>
+                <span class="badge bg-info rounded-pill">2 playlists</span>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- Dummy Smart Playlist Cards -->
+                <div class="col">
+                    <div class="card h-100 border-info shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0"><i class="bi bi-cpu me-2"></i>Recently Added</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Automatically adds songs added in the last 7 days</p>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Rule: Date Added > Last Week</li>
+                                <li class="list-group-item">Limit: 25 songs</li>
+                                <li class="list-group-item">Update: Daily</li>
+                            </ul>
+                            <div class="mt-3 d-grid gap-2">
+                                <button class="btn btn-outline-info">Edit Rules</button>
+                                <button class="btn btn-outline-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-info shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0"><i class="bi bi-cpu me-2"></i>Top Rated</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Your highest rated songs from all playlists</p>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Rule: Rating >= 4 stars</li>
+                                <li class="list-group-item">Limit: 50 songs</li>
+                                <li class="list-group-item">Update: Weekly</li>
+                            </ul>
+                            <div class="mt-3 d-grid gap-2">
+                                <button class="btn btn-outline-info">Edit Rules</button>
+                                <button class="btn btn-outline-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Add Playlist Modal -->
+    <div class="modal fade" id="addPlaylistModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Playlist Type</label>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary">
+                                <i class="bi bi-music-note-list me-2"></i>Standard Playlist
+                            </button>
+                            <button class="btn btn-outline-info">
+                                <i class="bi bi-cpu me-2"></i>Smart Playlist
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="playlistName" class="form-label">Playlist Name</label>
+                        <input type="text" class="form-control" id="playlistName" placeholder="Enter playlist name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="2" placeholder="Optional description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

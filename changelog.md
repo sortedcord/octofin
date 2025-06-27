@@ -11,15 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [ ] Playlist matching
   - [ ] Playlist creation
 - Dynamic Dark Mode Support
+- [ ] Error reporting for downloader
 
 ### Changed
 - Use context processing for footer version
 - Changelog formatting on homescreen
-- [ ] Refactor app config
+- [ ] Refactor settings to app config
 - Separated static js from html templates
+- Design update
 
 ### Fixed
 - [ ] DB error for likedplaylist app
+- [ ] Format error for release date causing failed download
 
 ## [0.0.1a] - 2025-06-25
 ### Added

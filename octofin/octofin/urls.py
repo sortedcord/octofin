@@ -5,7 +5,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ytm/', include('downloader.urls')),
-    path('likedplaylist/', include('likedplaylist.urls'))
+    path('likedplaylist/', include('likedplaylist.urls')),
+    path('playlistman/', include('playlistman.urls')),
+    path('config/', include('config.urls')),
 ]
 
 if settings.DEBUG:

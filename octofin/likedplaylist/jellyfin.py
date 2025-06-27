@@ -104,6 +104,9 @@ def update_playlist_icon(account, playlist_id, image_path):
     )
 
 def sync_playlist_for_account(account, config):
+    from config.utils import get_config
+    icon_path = get_config('LIKED_SONGS_PLAYLIST_ICON')
+
     if not account.is_active:
         return
     # Authentication

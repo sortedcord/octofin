@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'downloader',
-    'likedplaylist'
+    'likedplaylist',
+    'playlistman',
+    'config'
 ]
 
 MIDDLEWARE = [
@@ -63,11 +65,18 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'downloader.context_processors.footer_version'
+                'downloader.context_processors.footer_version',
+                'config.context_processor.global_config'
             ],
         },
     },
 ]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 WSGI_APPLICATION = 'octofin.wsgi.application'
 

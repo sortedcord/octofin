@@ -19,6 +19,8 @@ COPY . /app/
 
 EXPOSE 8193
 
+RUN python /app/octofin/manage.py init_config
+
 RUN python /app/octofin/manage.py makemigrations
 RUN python /app/octofin/manage.py makemigrations likedplaylist
 RUN python /app/octofin/manage.py makemigrations downloader

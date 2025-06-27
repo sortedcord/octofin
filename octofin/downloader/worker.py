@@ -10,9 +10,9 @@ from .utils import crop_to_square_bytes
 from .models import DictionaryKey
 
 
-COOKIES_PATH = os.getenv('COOKIES_PATH')
-PO_TOKEN = os.getenv('PO_TOKEN')
-OUTPUT_DIR = os.getenv('OCTO_OUTPUT_DIR')
+def get_worker_config(key):
+    from config.utils import get_config
+    return get_config(key)
 
 
 def download_image_bytes(url):
@@ -70,12 +70,15 @@ def getytdata(url:str) -> dict:
         raw_data = json.loads(open(file).read())
         return extract_data(raw_data)
 
+    cookies_path = get_worker_config('COOKIES_PATH')
+    po_token = get_worker_config('PO_TOKEN')
+
     ydl_opts = {
-        'cookiefile': f'{COOKIES_PATH}',
+        'cookiefile': f'{cookies_path}',
         'extract_flat': 'discard_in_playlist',
         'extractor_args': {
             'youtube': {
-                'po_token': [f'web_music.gvs+{PO_TOKEN}']
+                'po_token': [f'web_music.gvs+{po_token}']
                 }
             },
         }
