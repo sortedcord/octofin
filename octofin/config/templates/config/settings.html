@@ -1,82 +1,69 @@
 {% extends "downloader/base.html" %}
 {% block content %}
-
     <div class="container mt-4">
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            {% for message in messages %}
+                <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+
         <!-- Main Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="display-5">Configuration Settings</h1>
         </div>
 
-        <!-- Downloader Settings Section -->
-        <section class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h4">Downloader Configuration</h2>
-                <span class="badge bg-primary rounded-pill">3 settings</span>
+
+
+        <!-- Main Configuration Form -->
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="main_config">
+
+            {% for group_name, group in settings.items %}
+                <section class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h4">{{ group_name }}</h2>
+                        <span class="badge bg-primary rounded-pill">{{ group|length }} settings</span>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            {% for setting in group %}
+                                <div class="mb-3">
+                                    <label for="{{ setting.key }}" class="form-label">{{ setting.key }}</label>
+
+                                    {% if setting.config_type == "bool" %}
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                   id="{{ setting.key }}" name="{{ setting.key }}"
+                                                   {% if setting.value == 'true' %}checked{% endif %}>
+                                        </div>
+                                    {% else %}
+                                        <input type="text" class="form-control" id="{{ setting.key }}"
+                                               name="{{ setting.key }}" value="{{ setting.value }}">
+                                    {% endif %}
+
+                                    <div class="form-text">{{ setting.description }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            {% endfor %}
+
+            <div class="text-end mb-4">
+                <button type="submit" class="btn btn-primary">Save Settings</button>
             </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="poToken" class="form-label">GVS PO Token</label>
-                            <input type="text" class="form-control" id="poToken"
-                                   name="po_token" value="{{ po_token }}">
-                            <div class="form-text">Required for YouTube downloads</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="cookiesPath" class="form-label">Cookies File Path</label>
-                            <input type="text" class="form-control" id="cookiesPath"
-                                   name="cookies_path" value="{{ cookies_path }}">
-                            <div class="form-text">Path to browser cookies file</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="outputDir" class="form-label">Output Directory</label>
-                            <input type="text" class="form-control" id="outputDir"
-                                   name="output_dir" value="{{ output_dir }}">
-                            <div class="form-text">Where downloaded files are saved</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Liked Playlist Section -->
-        <section class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h4">Playlist Configuration</h2>
-                <span class="badge bg-info rounded-pill">2 settings</span>
-            </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="iconPath" class="form-label">Liked Songs Icon Path</label>
-                            <input type="text" class="form-control" id="iconPath"
-                                   name="icon_path" value="{{ icon_path }}">
-                            <div class="form-text">Path to custom playlist icon</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="syncInterval" class="form-label">Sync Interval</label>
-                            <select class="form-select" id="syncInterval" name="sync_interval">
-                                <option value="15" {% if sync_interval == 15 %}selected{% endif %}>15 minutes</option>
-                                <option value="30" {% if sync_interval == 30 %}selected{% endif %}>30 minutes</option>
-                                <option value="60" {% if sync_interval == 60 %}selected{% endif %}>1 hour</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                    </form>
-                </div>
-            </div>
-        </section>
+        </form>
 
         <!-- Server Connection Section -->
         <section class="mb-5">
@@ -89,16 +76,18 @@
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
+                        <input type="hidden" name="form_type" value="server_config">
+
                         <div class="mb-3">
                             <label for="serverUrl" class="form-label">Server URL</label>
                             <input type="url" class="form-control" id="serverUrl"
-                                   name="server_url" value="{{ server_url }}">
+                                   name="server_url" value="{{ server_url }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="apiKey" class="form-label">API Key</label>
                             <input type="password" class="form-control" id="apiKey"
-                                   name="api_key" value="{{ api_key }}">
+                                   name="api_key" value="{{ api_key }}" required>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -111,4 +100,17 @@
         </section>
     </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize and show toasts
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.map(function(toastEl) {
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        });
+    });
+</script>
 {% endblock %}

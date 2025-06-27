@@ -3,6 +3,43 @@ from io import BytesIO
 from PIL import Image
 import pykakasi
 import requests
+from enum import  Enum
+from config.utils import get_config
+
+
+class DownloaderError(Enum):
+    PO_TOKEN_NOT_AVAILABLE = 'A GVS PO Token has not been provided. You may not be able to download the best audio quality available.'
+    COOKIES_PATH_NOT_AVAILABLE = 'Path to cookies file has not been provided. You may not be able to download the best audio quality available.'
+    INVALID_COOKIE_DATA = 'The cookie file provided has invalid data. You may not be able to download the best audio quality available.'
+    INVALID_OUTPUT_LOCATION = 'Output location provided is either invalid or not accessible.'
+
+def downloader_availability() -> DownloaderError|int:
+    output_directory = get_config('OCTO_OUTPUT_DIR')
+    po_token = get_config('PO_TOKEN')
+    cookies_path = get_config('COOKIES_PATH')
+
+    if output_directory is None:
+        return DownloaderError.INVALID_OUTPUT_LOCATION
+
+    if not os.path.exists(output_directory):
+        return DownloaderError.INVALID_OUTPUT_LOCATION
+
+    if cookies_path is None or cookies_path=="":
+        return DownloaderError.COOKIES_PATH_NOT_AVAILABLE
+    if not os.path.exists(cookies_path):
+        return DownloaderError.COOKIES_PATH_NOT_AVAILABLE
+    try:
+        with open(cookies_path) as f:
+            data = f.read()
+            if data.strip() == "":
+                return DownloaderError.INVALID_COOKIE_DATA
+    except:
+        return DownloaderError.INVALID_COOKIE_DATA
+    if po_token is None or po_token== "":
+        return DownloaderError.PO_TOKEN_NOT_AVAILABLE
+
+    return 1
+
 
 def japanese_to_romaji(text: str) -> str:
     kakasi = pykakasi.kakasi()

@@ -1,0 +1,32 @@
+{
+  "COOKIES_PATH": {
+    "value": "",
+    "config_type": "path",
+    "description": "Path to cookies file",
+    "group": "Downloader Configuration"
+  },
+  "PO_TOKEN": {
+    "value": "",
+    "config_type": "str",
+    "description": "YouTube PO token",
+    "group": "Downloader Configuration"
+  },
+  "OCTO_OUTPUT_DIR": {
+    "value": "",
+    "config_type": "path",
+    "description": "Output directory",
+    "group": "Downloader Configuration"
+  },
+  "LIKED_SONGS_PLAYLIST_ICON": {
+    "value": "",
+    "config_type": "path",
+    "description": "Playlist icon path",
+    "group": "Playlist Configuration"
+  },
+  "STORE_FETCHED_METADATA": {
+    "value": "true",
+    "config_type": "bool",
+    "description": "Whether to save fetched metadata for caching purposes",
+    "group": "Downloader Configuration"
+  }
+}

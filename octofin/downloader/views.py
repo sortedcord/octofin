@@ -7,18 +7,36 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from .utils import japanese_to_romaji, read_changelog
+from .utils import japanese_to_romaji, read_changelog, downloader_availability, DownloaderError
+from config.models import  GlobalConfig
 
 
 def home(request):
     tasks = DownloadTask.objects.all().order_by('-created_at')
     changelog_data = read_changelog()
     current_version = changelog_data[0]['version']
+
+    downloader_available: DownloaderError|int = downloader_availability()
+    print(downloader_available)
+    error_message = None
+
+    if isinstance(downloader_available, DownloaderError):
+        error_message = downloader_available.value
+        if downloader_available == DownloaderError.INVALID_OUTPUT_LOCATION:
+            downloader_available = False
+        else:
+            downloader_available = True
+    else:
+        downloader_available = True
+
+
     return render(request, "downloader/index.html",
                   {
                       'tasks': tasks,
                       'current_version':current_version,
-                      'changelog': changelog_data
+                      'changelog': changelog_data,
+                      'downloader_available': downloader_available,
+                      'downloader_error_message': error_message
                   })
 
 

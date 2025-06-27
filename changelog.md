@@ -16,9 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Use context processing for footer version
 - Changelog formatting on homescreen
-- [ ] Refactor settings to app config
+- Refactor settings to app config
 - Separated static js from html templates
 - Design update
+- [ ] Switched from pykakasi to cutlet
 
 ### Fixed
 - [ ] DB error for likedplaylist app

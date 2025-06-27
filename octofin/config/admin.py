@@ -9,6 +9,6 @@ class GlobalConfigAdmin(admin.ModelAdmin):
     list_filter = ('config_type',)
     fieldsets = (
         ('Configuration', {
-            'fields': ('key', 'value', 'config_type', 'description')
+            'fields': ('key', 'value', 'config_type', 'description', 'group')
         }),
     )
