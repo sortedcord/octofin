@@ -1,3 +1,5 @@
+> [!NOTE]  
+> Octofin's development has moved to [groovbox/octofin](https://github.com/groovbox/octofin) as it is a part of the groovbox project now!
 # Octofin
 
 Octofin is a set of tools and scripts that adds QoL functionality to your Jellyfin music library.
