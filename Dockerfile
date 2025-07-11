@@ -25,6 +25,7 @@ RUN python /app/octofin/manage.py makemigrations
 RUN python /app/octofin/manage.py makemigrations likedplaylist
 RUN python /app/octofin/manage.py makemigrations downloader
 RUN python /app/octofin/manage.py migrate
+RUN python /app/octofin/manage.py collectstatic
 
 # Use Gunicorn as the entrypoint, point to the wsgi.py inside the Django project
 CMD ["gunicorn", "--chdir", "octofin", "--bind", "0.0.0.0:8193", "octofin.wsgi:application"]

@@ -19,9 +19,18 @@ class DownloadTask(models.Model):
         ('failed', 'Failed'),
         ('cancelled', 'Cancelled')
     ]
+
+    DOWNLOAD_ITEM_CHOICES = [
+        ('track', 'Track'),
+        ('album', 'Album'),
+        ('playlist', 'Playlist')
+    ]
+
     
     url = models.URLField()
     title = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='queued')
     created_at = models.DateTimeField(auto_now_add=True)
     metadata = models.JSONField(blank=True, null=True)  # Store fetched metadata
+    download_item = models.CharField(max_length=20, choices=DOWNLOAD_ITEM_CHOICES, default='track')
+

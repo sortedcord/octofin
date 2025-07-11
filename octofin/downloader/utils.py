@@ -5,6 +5,7 @@ import cutlet
 import requests
 from enum import  Enum
 from config.utils import get_config
+import re
 
 
 class DownloaderError(Enum):
@@ -113,6 +114,46 @@ def download_image_bytes(url):
     response.raise_for_status()
     return response.content
 
+
+def classify_youtube_music_list(url:str) -> (str, str):
+    from urllib.parse import urlparse, parse_qs
+
+    query = parse_qs(urlparse(url).query)
+    playlist_id = query.get("list", [""])[0]
+
+    if playlist_id.startswith("OL"):
+        return "album", playlist_id
+    elif playlist_id.startswith("RD") or playlist_id.startswith("PL") or playlist_id.startswith("VL"):
+        return "playlist", playlist_id
+    else:
+        return "unknown", playlist_id
+
+
+def update_googleusercontent_url(url:str, width:int, height:int, quality:int) -> None|str:
+    """
+    Update a Googleusercontent image URL with new width, height, and quality values.
+
+    Args:
+        url (str): The original URL.
+        width (int): Desired width.
+        height (int): Desired height.
+        quality (int): Desired quality (used in the 'l' parameter).
+
+    Returns:
+        str or None: Modified URL if pattern matches, else None.
+    """
+    pattern = r'(https://lh3\.googleusercontent\.com/[\w\-]+)=w\d+-h\d+-l\d+-'
+
+    if not re.match(pattern, url):
+        return None
+
+    updated_url = re.sub(
+        r'=w\d+-h\d+-l\d+-',
+        f'=w{width}-h{height}-l{quality}-',
+        url
+    )
+
+    return updated_url
 
 def fetch_lyrics():
     # TODO: Make use of a lyrics provider

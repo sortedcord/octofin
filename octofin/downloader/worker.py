@@ -4,7 +4,7 @@ import base64
 import struct
 import shutil
 from .utils import crop_to_square_bytes, download_image_bytes
-
+from config.utils import get_config
 
 def apply_metadata(file, info):
     audio = OggOpus(file)
@@ -75,7 +75,8 @@ def import_song(file_path, info):
     elif 'year' in info and info['year']:
         year = str(info['year'])
 
-    dest_dir = os.path.join(OUTPUT_DIR, album_artist, f'[{year}] {album}') # type: ignore
+    output_dir = get_config('OCTO_OUTPUT_DIR')
+    dest_dir = os.path.join(output_dir, album_artist, f'[{year}] {album}') # type: ignore
 
     os.makedirs(dest_dir, exist_ok=True)
     filename = os.path.basename(file_path)

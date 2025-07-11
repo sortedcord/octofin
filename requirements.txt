@@ -19,3 +19,4 @@ yt-dlp==2025.6.9
 gunicorn
 cutlet
 unidic-lite
+ytmusicapi

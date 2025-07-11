@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .worker import apply_metadata, import_song
-from .youtube import get_yt_data, download_song
+from .youtube import get_yt_data, download_song, process_playlist_metadata
 from .models import DownloadTask
 import threading
 import os
@@ -10,7 +10,6 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .utils import japanese_to_romaji, read_changelog, downloader_availability, DownloaderError
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 
 
 def home(request):
@@ -59,6 +58,11 @@ def create_task(request):
 
 def fetch_metadata(task_id):
     task = DownloadTask.objects.get(id=task_id)
+    # Check if playlist
+    if 'playlist' in task.url:
+        task.download_item = 'playlist'
+        process_playlist_metadata(task)
+
     try:
         metadata = get_yt_data(task.url)
         task.metadata = metadata # type: ignore
@@ -161,19 +165,6 @@ def clear_tasks(request):
     DownloadTask.objects.all().delete()
     return redirect('home')
 
-def settings(request):
-    cookies_path:str = os.getenv('COOKIES_PATH')
-    if cookies_path is not None and os.path.exists(cookies_path):
-        cookies_data = open(cookies_path).read()
-    else:
-        cookies_data= ""
-
-    return render(request, "downloader/settings.html", context={
-        'COOKIES_PATH': cookies_path,
-        'PO_TOKEN' : os.getenv('PO_TOKEN'),
-        'OUTPUT_DIR': os.getenv('OCTO_OUTPUT_DIR'),
-        'cookies_data':cookies_data
-    })
 
 @ensure_csrf_cookie
 def romanize(request):
